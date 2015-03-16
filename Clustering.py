@@ -3,7 +3,7 @@ __author__ = 'blaz'
 import pandas as pd
 
 def main():
-    unemployment_file = "C:\BigData\Zemanta_challenge_1_data\unemployment_by_zip"
+    unemployment_file = "C:\BigData\Zemanta_challenge_1_data/unemployment_by_zip"
 
 
 
