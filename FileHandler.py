@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def file_handler(file1, file2, output_file):
+def file_handler(file1, file2, output_csv):
     """
     Read both csv files and merge them by ZIP
     """
@@ -10,11 +10,7 @@ def file_handler(file1, file2, output_file):
 
     merge = pd.merge(df_population, df_unemployment, how = 'left', left_on = 'Zip/ZCTA', right_on = 'Zip')
 
-    merge.to_csv(output_file)
-
-
-
-
+    merge.to_csv(output_csv)
 
 
 unemployment_file = "C:\BigData\Zemanta_challenge_1_data/unemployment_by_zip.csv"
