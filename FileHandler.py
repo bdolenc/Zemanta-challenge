@@ -16,7 +16,8 @@ def file_handler(file1, file2, output_csv):
 def merge_establishments(input_name, output_name):
     """
     Read chunks of establishments_by_zip in pandas
-    dataframe and append to appropriate zip in dataframe
+    data frame and append to appropriate zip in
+    data frame
     """
     # new column names
     column_names = ['ZIP', '_all', '_1to4', '_5to9', '_10to19', '_20to49', '_50to99', '_100to249',
