@@ -14,7 +14,7 @@ def process_data(dataset):
     to numpy array
     """
     df_data = pd.read_csv(dataset, sep=',', header=0)
-    df_data = df_data[:10000]
+    #df_data = df_data[:10000]
     df_data = df_data.fillna(0)
     print "---procesing data done---"
     return df_data
@@ -94,5 +94,5 @@ outliers = sum(1 for zip in out_in if zip < threshold)
 #print outliers
 #out_in = [item for sublist in out_in for item in sublist]
 #print out_in
-#plot_outliers(data, out_in, threshold)
+plot_outliers(data, out_in, threshold)
 #db_scan(data)
