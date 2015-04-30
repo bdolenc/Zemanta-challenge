@@ -13,26 +13,39 @@ def process_data(dataset):
     Open csv and read data
     to numpy array
     """
+    print "---procesing data...",
     df_data = pd.read_csv(dataset, sep=',', header=0)
-    #df_data = df_data[:10000]
+    df_data = df_data[:10000]
+    l_zip = df_data['ZIP']
+    del df_data['ZIP']
     df_data = df_data.fillna(0)
-    print "---procesing data done---"
+    print "done---"
     return df_data
 
 
-def svm_outliers_detect(data):
+def svm_outliers_detect(X):
     """
     Perform single class svm
     to detect outliers
     """
     clf_svm = svm.OneClassSVM(nu=0.25, gamma=0.05)
-    clf_svm.fit(data)
+    clf_svm.fit(X)
     print "---fitting done---"
-    clf_svm.fit
-    results = clf_svm.decision_function(data)
-    print "---detecting outliers done---"
-    return results
+    y_pred = clf_svm.decision_function(X).ravel()
 
+    print len(y_pred)
+
+    print "---detecting outliers done---"
+    i_pca = IncrementalPCA(n_components=2, batch_size=10000)
+    X = i_pca.fit(data).transform(data)
+    plt.figure()
+
+    n_outliers = 800
+    b = plt.scatter(X[:-n_outliers, 0], X[:-n_outliers, 1], c='red')
+    c = plt.scatter(X[-n_outliers:, 0], X[-n_outliers:, 1], c='blue')
+
+    plt.show()
+    return X
 
 def plot_outliers(data, outliers, thresh):
     """
@@ -42,12 +55,16 @@ def plot_outliers(data, outliers, thresh):
     i_pca = IncrementalPCA(n_components=2, batch_size=10000)
     X = i_pca.fit(data).transform(data)
     plt.figure()
-    for x, o in zip(X, outliers):
-        if o < thresh:
-            color = "red"
-        else:
-            color = "blue"
-        plt.scatter(x[0], x[1], color=color)
+    #for x, o in zip(X, outliers):
+    #    if o < thresh:
+    #        color = "red"
+    #    else:
+    #        color = "blue"
+    #    plt.scatter(x[0], x[1], color=color)
+    n_outliers = 800
+    b = plt.scatter(X[:-n_outliers, 0], X[:-n_outliers, 1], c='red')
+    c = plt.scatter(X[-n_outliers:, 0], X[-n_outliers:, 1], c='blue')
+
     plt.show()
     print "---PCA done---"
 
@@ -56,15 +73,22 @@ def db_scan(data):
     """
     Perform DB Scan on data.
     """
+    print "---DBScan...",
     X = StandardScaler().fit_transform(data)
-    db = DBSCAN(eps=0.8, min_samples=40).fit(X)
+    db = DBSCAN(eps=15, min_samples=10).fit(X)
+    labels = db.labels_
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    unique_labels = set(labels)
+    print "done---"
+    print "Clusters found: ", n_clusters_
+
+    #plot clusters and outliers
+    i_pca = IncrementalPCA(n_components=2, batch_size=10000)
+    X = i_pca.fit(data).transform(data)
+    colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
     labels = db.labels_
-    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-
-    unique_labels = set(labels)
-    colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
     for k, col in zip(unique_labels, colors):
         if k == -1:
             # Black used for noise.
@@ -83,16 +107,16 @@ def db_scan(data):
     plt.title('Estimated number of clusters: %d' % n_clusters_)
     plt.show()
 
+
+
+
+
 data_file = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
 data = process_data(data_file)
 #print data
-out_in = svm_outliers_detect(data)
+#out_in = svm_outliers_detect(data)
 
-threshold = stats.scoreatpercentile(out_in, 10)
-#print threshold
-outliers = sum(1 for zip in out_in if zip < threshold)
-#print outliers
-#out_in = [item for sublist in out_in for item in sublist]
+#threshold = stats.scoreatpercentile(out_in, 10)
 #print out_in
-plot_outliers(data, out_in, threshold)
-#db_scan(data)
+#plot_outliers(data, out_in, threshold)
+db_scan(data)
