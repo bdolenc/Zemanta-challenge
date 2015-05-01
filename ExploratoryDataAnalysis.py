@@ -5,6 +5,7 @@ from scipy import stats
 from sklearn.decomposition import IncrementalPCA
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn import preprocessing
 import numpy as np
 
 
@@ -19,6 +20,12 @@ def process_data(dataset):
     l_zip = df_data['ZIP']
     del df_data['ZIP']
     df_data = df_data.fillna(0)
+    print "done---"
+    #normalize
+    print "---normalizing data...",
+    df_data = preprocessing.normalize(df_data, norm="l1")
+    #df_data = preprocessing.scale(df_data)
+
     print "done---"
     return df_data
 
@@ -74,8 +81,8 @@ def db_scan(data):
     Perform DB Scan on data.
     """
     print "---DBScan...",
-    X = StandardScaler().fit_transform(data)
-    db = DBSCAN(eps=15, min_samples=10).fit(X)
+    #X = StandardScaler().fit_transform(data)
+    db = DBSCAN(eps=25, min_samples=10).fit(data)
     labels = db.labels_
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     unique_labels = set(labels)
