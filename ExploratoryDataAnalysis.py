@@ -23,8 +23,8 @@ def process_data(dataset):
     print "done---"
     #normalize
     print "---normalizing data...",
-    df_data = preprocessing.normalize(df_data, norm="l1")
-    #df_data = preprocessing.scale(df_data)
+    df_data = preprocessing.normalize(df_data, norm="l2")
+    df_data = preprocessing.scale(df_data)
 
     print "done---"
     return df_data
@@ -82,7 +82,7 @@ def db_scan(data):
     """
     print "---DBScan...",
     #X = StandardScaler().fit_transform(data)
-    db = DBSCAN(eps=25, min_samples=10).fit(data)
+    db = DBSCAN(eps=0.03, min_samples=10).fit(data)
     labels = db.labels_
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     unique_labels = set(labels)
@@ -118,7 +118,7 @@ def db_scan(data):
 
 
 
-data_file = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
+data_file = "C:\BigData\Zemanta_challenge_1_data/final_data.csv"
 data = process_data(data_file)
 #print data
 #out_in = svm_outliers_detect(data)

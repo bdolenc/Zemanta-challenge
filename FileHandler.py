@@ -9,7 +9,10 @@ def file_handler(file1, file2, output_csv):
     df_unemployment = pd.read_csv(file1)
     df_population = pd.read_csv(file2)
 
-    merge = pd.merge(df_population, df_unemployment, how='left', left_on='Zip/ZCTA', right_on='Zip')
+    merge = pd.merge(df_unemployment, df_population, how='left', left_on='ZIP', right_on='Zip/ZCTA')
+    del merge['Unnamed: 0_x'], merge['Land-Sq-Mi'], merge['# in sample'], merge['Zip'], merge['Unnamed: 0_y'], merge['Zip/ZCTA'], merge['2010 Population']
+    #merge['Unemp. Rate'] = merge['Unemp. Rate'].map(lambda x: x.strip('%'))
+    merge['Unemp. Rate'] = merge['Unemp. Rate'].str.strip('%')
     merge.to_csv(output_csv)
 
 
@@ -81,10 +84,10 @@ def merge_establishments(input_name, output_name):
     df_total.to_csv(output_name)
 
 
-unemployment_file = "C:\BigData\Zemanta_challenge_1_data/unemployment_by_zip.csv"
-population_file = "C:\BigData\Zemanta_challenge_1_data/population_densisty_area_by_zip.csv"
-output_file = "C:\BigData\Zemanta_challenge_1_data/output.csv"
+unemployment_file = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
+population_file = "C:\BigData\Zemanta_challenge_1_data/output.csv"
+output_file = "C:\BigData\Zemanta_challenge_1_data/final_data.csv"
 establishments_file = "C:\BigData\Zemanta_challenge_1_data/establishments_by_zip.dat"
 establishments_out = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
-#file_handler(unemployment_file, population_file, output_file)
-merge_establishments(establishments_file, establishments_out)
+file_handler(unemployment_file, population_file, output_file)
+#merge_establishments(establishments_file, establishments_out)
