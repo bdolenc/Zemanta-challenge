@@ -7,6 +7,9 @@ from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn import preprocessing
 import numpy as np
+from sklearn.manifold import MDS
+from sklearn.cluster import AgglomerativeClustering
+
 
 
 def process_data(dataset):
@@ -23,8 +26,12 @@ def process_data(dataset):
     print "done---"
     #normalize
     print "---normalizing data...",
-    df_data = preprocessing.normalize(df_data, norm="l2")
-    df_data = preprocessing.scale(df_data)
+    #df_data = preprocessing.normalize(df_data, norm="l2")
+    x = df_data.values #returns a numpy array
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(x)
+    df_data = pd.DataFrame(x_scaled)
+    #df_data = preprocessing.scale(df_data)
 
     print "done---"
     return df_data
@@ -82,16 +89,23 @@ def db_scan(data):
     """
     print "---DBScan...",
     #X = StandardScaler().fit_transform(data)
-    db = DBSCAN(eps=0.03, min_samples=10).fit(data)
+    db = DBSCAN(eps=2, min_samples=10).fit(data)
     labels = db.labels_
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    n_outliers_ = sum(1 for outlier in labels if outlier == -1)
     unique_labels = set(labels)
     print "done---"
-    print "Clusters found: ", n_clusters_
+    print "Clusters found: ", n_clusters_, " Outliers: ", n_outliers_
 
     #plot clusters and outliers
-    i_pca = IncrementalPCA(n_components=2, batch_size=10000)
-    X = i_pca.fit(data).transform(data)
+
+    #PCA
+    #i_pca = IncrementalPCA(n_components=2, batch_size=10000)
+    #X = i_pca.fit(data).transform(data)
+    #MDS
+    mds = MDS(n_components=2)
+    X = mds.fit(data)
+
     colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
     core_samples_mask[db.core_sample_indices_] = True
@@ -115,6 +129,31 @@ def db_scan(data):
     plt.show()
 
 
+def hierarhical_clustering(data):
+    """
+    Perform Hierarhical
+    clustering on data
+    """
+    print "---Hierarhical clustering...",
+    hc = AgglomerativeClustering(n_clusters=20, linkage='complete').fit(data)
+    labels = hc.labels_
+    unique_labels = set(labels)
+    colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
+
+
+    #PCA
+    i_pca = IncrementalPCA(n_components=2, batch_size=10000)
+    X = i_pca.fit(data).transform(data)
+    print "done---"
+    #print "Clusters found: ", n_clusters_, " Outliers: ", n_outliers_
+    #print labels
+    for i in range(len(X)):
+        plt.scatter(X[i, 0], X[i, 1], c=colors[labels[i]])
+
+
+
+    #plt.title('Estimated number of clusters: %d' % n_clusters_)
+    plt.show()
 
 
 
@@ -126,4 +165,5 @@ data = process_data(data_file)
 #threshold = stats.scoreatpercentile(out_in, 10)
 #print out_in
 #plot_outliers(data, out_in, threshold)
-db_scan(data)
+#db_scan(data)
+hierarhical_clustering(data)

@@ -84,10 +84,21 @@ def merge_establishments(input_name, output_name):
     df_total.to_csv(output_name)
 
 
+def zip_remover(training_set):
+    """
+    Remove zipcodes not
+    in learning data.
+    """
+    df_training = pd.read_csv(training_set, sep='\t')
+    print len(set(df_training['zip']))
+
+
 unemployment_file = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
 population_file = "C:\BigData\Zemanta_challenge_1_data/output.csv"
 output_file = "C:\BigData\Zemanta_challenge_1_data/final_data.csv"
 establishments_file = "C:\BigData\Zemanta_challenge_1_data/establishments_by_zip.dat"
 establishments_out = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
-file_handler(unemployment_file, population_file, output_file)
+training_set = "C:\BigData\Zemanta_challenge_1_data/training_set.tsv"
+#file_handler(unemployment_file, population_file, output_file)
 #merge_establishments(establishments_file, establishments_out)
+zip_remover(training_set)
