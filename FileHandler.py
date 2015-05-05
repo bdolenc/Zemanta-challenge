@@ -10,11 +10,28 @@ def file_handler(file1, file2, output_csv):
     df_population = pd.read_csv(file2)
 
     merge = pd.merge(df_unemployment, df_population, how='left', left_on='ZIP', right_on='Zip/ZCTA')
-    del merge['Unnamed: 0_x'], merge['Land-Sq-Mi'], merge['# in sample'], merge['Zip'], merge['Unnamed: 0_y'], merge['Zip/ZCTA'], merge['2010 Population']
-    #merge['Unemp. Rate'] = merge['Unemp. Rate'].map(lambda x: x.strip('%'))
+    del merge['Unnamed: 0_x'], merge['# in sample'], \
+        merge['Zip'], merge['Unnamed: 0_y'], merge['Zip/ZCTA'], merge['2010 Population']
     merge['Unemp. Rate'] = merge['Unemp. Rate'].str.strip('%')
-    merge.to_csv(output_csv)
 
+    #merge.convert_objects(convert_numeric=True)
+
+    #compute average unemployment
+    #av_unemployment = merge['Unemp. Rate'].mean()
+    #print av_unemployment
+
+    #replace NaN values with zeroes
+    #merge.fillna(0)
+
+
+    #use average unemployment instead of Nan for ['Unemp. Rate'].
+    #replace NaN values with zeroes
+    #merge = merge.fillna(0)
+
+
+
+    merge.to_csv(output_csv)
+    return merge
 
 def merge_establishments(input_name, output_name):
     """
@@ -93,12 +110,70 @@ def zip_remover(training_set):
     print len(set(df_training['zip']))
 
 
+def merge_demographic(dem_data, fin_data):
+    """
+    Read final dataset and append
+    demographic data
+    """
+    df_final = pd.read_csv(fin_data)
+    df_demo = pd.read_csv(dem_data)
+    df_demo = df_demo[['GEO.display-label', 'HD02_S03', 'HD02_S04', 'HD02_S05', 'HD02_S06', 'HD02_S07', 'HD02_S10', 'HD02_S23']]
+    #remove labels in 1st row
+    df_demo = df_demo.ix[1:]
+    #extract zip
+    df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
+    #rename columns
+    df_demo.columns = ['ZIP', 'White', 'Black', 'Indian', 'Native', 'Alaska', 'Asian', 'Other']
+    #ZIP to int
+    df_demo['ZIP'] = df_demo['ZIP'].astype(float)
+
+
+    merge = pd.merge(df_final, df_demo, how='left', left_on='ZIP', right_on='ZIP')
+
+    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/part_two.csv")
+    return merge
+
+
+def merge_age(age_data, fin_data):
+    """
+    Read final dataset and
+    append age data
+    """
+    df_final = pd.read_csv(fin_data)
+    df_demo = pd.read_csv(age_data)
+    df_demo = df_demo[['GEO.display-label', 'HD03_S01', 'SUBHD0201_S02', 'SUBHD0201_S03', 'SUBHD0201_S04', 'SUBHD0201_S05', 'SUBHD0201_S06', 'SUBHD0201_S07', 'SUBHD0201_S08',
+                       'SUBHD0201_S09', 'SUBHD0201_S10', 'SUBHD0201_S11', 'SUBHD0201_S12', 'SUBHD0201_S13', 'SUBHD0201_S14', 'SUBHD0201_S15', 'SUBHD0201_S16', 'SUBHD0201_S17',
+                       'SUBHD0201_S18', 'SUBHD0201_S19', 'SUBHD0201_S20']]
+    #remove labels in 1st row
+    df_demo = df_demo.ix[1:]
+    #extract zip
+    df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
+    #rename columns
+    df_demo.columns = ['ZIP', 'MalesPerFemales', 'Under5', '_5to9', '_10to14', '_14to19', '_20to24', '_25to29', '_30to34',
+                       '_35to39', '_40to44', '_45to49', '_50to54', '_55to59', '_60to64', '_65to69', '_70to74', '_75to79', '_80to84', '_85to89', '_90over']
+
+    df_demo['ZIP'] = df_demo['ZIP'].astype(float)
+    merge = pd.merge(df_final, df_demo, how='left', left_on='ZIP', right_on='ZIP')
+    merge = merge[pd.notnull(merge['Unemp. Rate'])]
+    merge = merge.fillna(0)
+    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv")
+    return merge
+
+
+
 unemployment_file = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
 population_file = "C:\BigData\Zemanta_challenge_1_data/output.csv"
-output_file = "C:\BigData\Zemanta_challenge_1_data/final_data.csv"
+output_file = "C:\BigData\Zemanta_challenge_1_data/part_one.csv"
 establishments_file = "C:\BigData\Zemanta_challenge_1_data/establishments_by_zip.dat"
 establishments_out = "C:\BigData\Zemanta_challenge_1_data/output_test.csv"
 training_set = "C:\BigData\Zemanta_challenge_1_data/training_set.tsv"
-#file_handler(unemployment_file, population_file, output_file)
+#partial = file_handler(unemployment_file, population_file, output_file)
 #merge_establishments(establishments_file, establishments_out)
-zip_remover(training_set)
+#zip_remover(training_set)
+fin_data = "C:\BigData\Zemanta_challenge_1_data/part_one.csv"
+dem_data = "C:\BigData\Zemanta_challenge_1_data/demographic.csv"
+age_data = "C:\BigData\Zemanta_challenge_1_data/age.csv"
+part_two = "C:\BigData\Zemanta_challenge_1_data/part_two.csv"
+#merge_demographic(dem_data, fin_data)
+merge_age(age_data, part_two)
+

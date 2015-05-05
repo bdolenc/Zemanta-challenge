@@ -19,10 +19,15 @@ def process_data(dataset):
     """
     print "---procesing data...",
     df_data = pd.read_csv(dataset, sep=',', header=0)
-    df_data = df_data[:10000]
+    #df_data = df_data[:10000]
+    #testing on part of data
+    df_data = df_data.iloc[::10, :]
+    df_data = df_data.replace('(X)', 0)
+    df_data = df_data.astype(float)
+    df_data = df_data[df_data.MalesPerFemales != 0]
+    print df_data
     l_zip = df_data['ZIP']
     del df_data['ZIP']
-    df_data = df_data.fillna(0)
     print "done---"
     #normalize
     print "---normalizing data...",
@@ -31,7 +36,7 @@ def process_data(dataset):
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(x)
     df_data = pd.DataFrame(x_scaled)
-    #df_data = preprocessing.scale(df_data)
+    df_data = preprocessing.scale(df_data)
 
     print "done---"
     return df_data
@@ -89,7 +94,7 @@ def db_scan(data):
     """
     print "---DBScan...",
     #X = StandardScaler().fit_transform(data)
-    db = DBSCAN(eps=2, min_samples=10).fit(data)
+    db = DBSCAN(eps=10, min_samples=10).fit(data)
     labels = db.labels_
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     n_outliers_ = sum(1 for outlier in labels if outlier == -1)
@@ -100,11 +105,11 @@ def db_scan(data):
     #plot clusters and outliers
 
     #PCA
-    #i_pca = IncrementalPCA(n_components=2, batch_size=10000)
-    #X = i_pca.fit(data).transform(data)
+    i_pca = IncrementalPCA(n_components=2, batch_size=10000)
+    X = i_pca.fit(data).transform(data)
     #MDS
-    mds = MDS(n_components=2)
-    X = mds.fit(data)
+    #mds = MDS(n_components=2)
+    #X = mds.fit(data)
 
     colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
     core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
@@ -135,7 +140,7 @@ def hierarhical_clustering(data):
     clustering on data
     """
     print "---Hierarhical clustering...",
-    hc = AgglomerativeClustering(n_clusters=20, linkage='complete').fit(data)
+    hc = AgglomerativeClustering(n_clusters=20, linkage='ward').fit(data)
     labels = hc.labels_
     unique_labels = set(labels)
     colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
@@ -157,7 +162,7 @@ def hierarhical_clustering(data):
 
 
 
-data_file = "C:\BigData\Zemanta_challenge_1_data/final_data.csv"
+data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv"
 data = process_data(data_file)
 #print data
 #out_in = svm_outliers_detect(data)
