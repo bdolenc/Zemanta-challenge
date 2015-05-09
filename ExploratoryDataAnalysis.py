@@ -31,12 +31,12 @@ def process_data(dataset):
     print "done---"
     #normalize
     print "---normalizing data...",
-    #df_data = preprocessing.normalize(df_data, norm="l2")
-    x = df_data.values #returns a numpy array
-    min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = min_max_scaler.fit_transform(x)
-    df_data = pd.DataFrame(x_scaled)
-    df_data = preprocessing.scale(df_data)
+    df_data = preprocessing.normalize(df_data, norm="l1")
+    #x = df_data.values #returns a numpy array
+    #min_max_scaler = preprocessing.MinMaxScaler()
+    #x_scaled = min_max_scaler.fit_transform(x)
+    #df_data = pd.DataFrame(x_scaled)
+    #df_data = preprocessing.scale(df_data)
 
     print "done---"
     return df_data
