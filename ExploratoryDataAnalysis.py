@@ -9,7 +9,7 @@ from sklearn import preprocessing
 import numpy as np
 from sklearn.manifold import MDS
 from sklearn.cluster import AgglomerativeClustering
-
+import csv
 
 
 def process_data(dataset):
@@ -19,13 +19,12 @@ def process_data(dataset):
     """
     print "---procesing data...",
     df_data = pd.read_csv(dataset, sep=',', header=0)
-    #df_data = df_data[:10000]
     #testing on part of data
-    df_data = df_data.iloc[::10, :]
+    df_data = df_data.iloc[::20, :]
     df_data = df_data.replace('(X)', 0)
     df_data = df_data.astype(float)
     df_data = df_data[df_data.MalesPerFemales != 0]
-    print df_data
+
     l_zip = df_data['ZIP']
     del df_data['ZIP']
     print "done---"
@@ -39,7 +38,7 @@ def process_data(dataset):
     #df_data = preprocessing.scale(df_data)
 
     print "done---"
-    return df_data
+    return df_data, l_zip
 
 
 def svm_outliers_detect(X):
@@ -160,10 +159,21 @@ def hierarhical_clustering(data):
     #plt.title('Estimated number of clusters: %d' % n_clusters_)
     plt.show()
 
+    return labels
+
+
+def results_to_csv(zips, labels, output):
+
+    with open(output, "wb") as csv_file:
+
+        w = csv.writer(csv_file, delimiter=',')
+        data = zip(map(int, zips), labels)
+        w.writerows(data)
+
 
 
 data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv"
-data = process_data(data_file)
+data, zips = process_data(data_file)
 #print data
 #out_in = svm_outliers_detect(data)
 
@@ -171,4 +181,5 @@ data = process_data(data_file)
 #print out_in
 #plot_outliers(data, out_in, threshold)
 #db_scan(data)
-hierarhical_clustering(data)
+labels = hierarhical_clustering(data)
+results_to_csv(zips, labels, 'hc_results.csv')

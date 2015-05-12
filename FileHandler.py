@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import csv
 
+
 def file_handler(file1, file2, output_csv):
     """
     Read both csv files and merge them by ZIP
