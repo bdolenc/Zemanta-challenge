@@ -30,7 +30,7 @@ def process_data(dataset):
     print "done---"
     #normalize
     print "---normalizing data...",
-    df_data = preprocessing.normalize(df_data, norm="l1")
+    df_data_n = preprocessing.normalize(df_data, norm="l1")
     #x = df_data.values #returns a numpy array
     #min_max_scaler = preprocessing.MinMaxScaler()
     #x_scaled = min_max_scaler.fit_transform(x)
@@ -38,7 +38,7 @@ def process_data(dataset):
     #df_data = preprocessing.scale(df_data)
 
     print "done---"
-    return df_data, l_zip
+    return df_data_n, l_zip, df_data
 
 
 def svm_outliers_detect(X):
@@ -171,9 +171,38 @@ def results_to_csv(zips, labels, output):
         w.writerows(data)
 
 
+def averages(labels, all_data):
+    """
+    Calculate  white %, income,
+    unemployment, density average
+    """
+    column_names = ['Labels', 'White %', 'Black %', 'Unemp. Rate', 'Density Per Sq Mile']
+    df_average = pd.DataFrame(data=np.zeros((0, len(column_names))), columns=column_names)
+    print "---Computing averages...",
+    n_clusters = len(set(labels))
+    for i in range(0, n_clusters):
+        sum_white, sum_black, sum_unem, sum_den, count = 0, 0, 0, 0, 0
+        for row, label in zip(all_data.iterrows(), labels):
+            if label == i:
+                sum_white += row[1]['White']
+                sum_black += row[1]['Black']
+                sum_unem += row[1]['Unemp. Rate']
+                sum_den += row[1]['Density Per Sq Mile']
+                count +=1
+        white = sum_white / count
+        black = sum_black / count
+        unemp = sum_unem / count
+        dens   = sum_den / count
+
+        df_average = df_average.append({'Labels': i, 'White %': white, 'Black %': black, 'Unemp. Rate': unemp, 'Density Per Sq Mile': sum_den}, ignore_index='true')
+    print "done---"
+    df_average.to_csv('averages_per_cluster.csv')
+
+    return df_average
+
 
 data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv"
-data, zips = process_data(data_file)
+data, zips, raw_data = process_data(data_file)
 #print data
 #out_in = svm_outliers_detect(data)
 
@@ -183,3 +212,4 @@ data, zips = process_data(data_file)
 #db_scan(data)
 labels = hierarhical_clustering(data)
 results_to_csv(zips, labels, 'hc_results.csv')
+averages(labels, raw_data)
