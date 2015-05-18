@@ -20,7 +20,7 @@ def process_data(dataset):
     print "---procesing data...",
     df_data = pd.read_csv(dataset, sep=',', header=0)
     #testing on part of data
-    df_data = df_data.iloc[::20, :]
+    df_data = df_data.iloc[::5, :]
     df_data = df_data.replace('(X)', 0)
     df_data = df_data.astype(float)
     df_data = df_data[df_data.MalesPerFemales != 0]
@@ -201,7 +201,7 @@ def averages(labels, all_data):
     return df_average
 
 
-data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv"
+data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
 data, zips, raw_data = process_data(data_file)
 #print data
 #out_in = svm_outliers_detect(data)

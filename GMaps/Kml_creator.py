@@ -139,7 +139,7 @@ def main():
     # If an argument was passed to the script, it splits the argument on a comma
     # and uses the resulting list to specify an order for when columns get added.
     # Otherwise, it defaults to the order used in the sample.
-    all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv"
+    all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
     df_data = prepare_data('zipcode.csv', '../hc_results.csv')
     kml = createKML(df_data, 'google-points.kml', '../averages_per_cluster.csv', all_file)
 

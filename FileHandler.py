@@ -118,11 +118,11 @@ def merge_demographic(dem_data, fin_data):
     """
     df_final = pd.read_csv(fin_data)
     df_demo = pd.read_csv(dem_data)
-    df_demo = df_demo[['GEO.display-label', 'HD02_S03', 'HD02_S04', 'HD02_S05', 'HD02_S06', 'HD02_S07', 'HD02_S10', 'HD02_S23']]
+    df_demo = df_demo[['GEO.id2', 'HD02_S03', 'HD02_S04', 'HD02_S05', 'HD02_S06', 'HD02_S07', 'HD02_S10', 'HD02_S23']]
     #remove labels in 1st row
     df_demo = df_demo.ix[1:]
     #extract zip
-    df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
+    #df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
     #rename columns
     df_demo.columns = ['ZIP', 'White', 'Black', 'Indian', 'Native', 'Alaska', 'Asian', 'Other']
     #ZIP to int
@@ -131,7 +131,7 @@ def merge_demographic(dem_data, fin_data):
 
     merge = pd.merge(df_final, df_demo, how='left', left_on='ZIP', right_on='ZIP')
 
-    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/part_two.csv")
+    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/part_two_new2.csv")
     return merge
 
 
@@ -142,13 +142,13 @@ def merge_age(age_data, fin_data):
     """
     df_final = pd.read_csv(fin_data)
     df_demo = pd.read_csv(age_data)
-    df_demo = df_demo[['GEO.display-label', 'HD03_S01', 'SUBHD0201_S02', 'SUBHD0201_S03', 'SUBHD0201_S04', 'SUBHD0201_S05', 'SUBHD0201_S06', 'SUBHD0201_S07', 'SUBHD0201_S08',
+    df_demo = df_demo[['GEO.id2', 'HD03_S01', 'SUBHD0201_S02', 'SUBHD0201_S03', 'SUBHD0201_S04', 'SUBHD0201_S05', 'SUBHD0201_S06', 'SUBHD0201_S07', 'SUBHD0201_S08',
                        'SUBHD0201_S09', 'SUBHD0201_S10', 'SUBHD0201_S11', 'SUBHD0201_S12', 'SUBHD0201_S13', 'SUBHD0201_S14', 'SUBHD0201_S15', 'SUBHD0201_S16', 'SUBHD0201_S17',
                        'SUBHD0201_S18', 'SUBHD0201_S19', 'SUBHD0201_S20']]
     #remove labels in 1st row
     df_demo = df_demo.ix[1:]
     #extract zip
-    df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
+    #df_demo['GEO.display-label'] = df_demo['GEO.display-label'].str.strip('ZCTA5 ')
     #rename columns
     df_demo.columns = ['ZIP', 'MalesPerFemales', 'Under5', '_5to9', '_10to14', '_14to19', '_20to24', '_25to29', '_30to34',
                        '_35to39', '_40to44', '_45to49', '_50to54', '_55to59', '_60to64', '_65to69', '_70to74', '_75to79', '_80to84', '_85to89', '_90over']
@@ -157,7 +157,7 @@ def merge_age(age_data, fin_data):
     merge = pd.merge(df_final, df_demo, how='left', left_on='ZIP', right_on='ZIP')
     merge = merge[pd.notnull(merge['Unemp. Rate'])]
     merge = merge.fillna(0)
-    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/FINAL_nan.csv")
+    merge.to_csv("C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv")
     return merge
 
 
@@ -174,7 +174,7 @@ training_set = "C:\BigData\Zemanta_challenge_1_data/training_set.tsv"
 fin_data = "C:\BigData\Zemanta_challenge_1_data/part_one.csv"
 dem_data = "C:\BigData\Zemanta_challenge_1_data/demographic.csv"
 age_data = "C:\BigData\Zemanta_challenge_1_data/age.csv"
-part_two = "C:\BigData\Zemanta_challenge_1_data/part_two.csv"
+part_two = "C:\BigData\Zemanta_challenge_1_data/part_two_new2.csv"
 #merge_demographic(dem_data, fin_data)
 merge_age(age_data, part_two)
 
