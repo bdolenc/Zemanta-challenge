@@ -20,7 +20,7 @@ def process_data(dataset):
     print "---procesing data...",
     df_data = pd.read_csv(dataset, sep=',', header=0)
     #testing on part of data
-    df_data = df_data.iloc[::5, :]
+    df_data = df_data.iloc[::10, :]
     df_data = df_data.replace('(X)', 0)
     df_data = df_data.astype(float)
     df_data = df_data[df_data.MalesPerFemales != 0]
@@ -35,7 +35,7 @@ def process_data(dataset):
     #min_max_scaler = preprocessing.MinMaxScaler()
     #x_scaled = min_max_scaler.fit_transform(x)
     #df_data = pd.DataFrame(x_scaled)
-    #df_data = preprocessing.scale(df_data)
+    df_data_n = preprocessing.scale(df_data)
 
     print "done---"
     return df_data_n, l_zip, df_data
@@ -131,6 +131,7 @@ def db_scan(data):
 
     plt.title('Estimated number of clusters: %d' % n_clusters_)
     plt.show()
+    return labels
 
 
 def hierarhical_clustering(data):
@@ -139,7 +140,7 @@ def hierarhical_clustering(data):
     clustering on data
     """
     print "---Hierarhical clustering...",
-    hc = AgglomerativeClustering(n_clusters=20, linkage='ward').fit(data)
+    hc = AgglomerativeClustering(n_clusters=40, linkage='ward').fit(data)
     labels = hc.labels_
     unique_labels = set(labels)
     colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
@@ -181,20 +182,21 @@ def averages(labels, all_data):
     print "---Computing averages...",
     n_clusters = len(set(labels))
     for i in range(0, n_clusters):
-        sum_white, sum_black, sum_unem, sum_den, count = 0, 0, 0, 0, 0
+        sum_white, sum_black, sum_unem, sum_den, sum_land, count = 0, 0, 0, 0, 0, 0
         for row, label in zip(all_data.iterrows(), labels):
             if label == i:
                 sum_white += row[1]['White']
                 sum_black += row[1]['Black']
                 sum_unem += row[1]['Unemp. Rate']
                 sum_den += row[1]['Density Per Sq Mile']
+                sum_land += row[1]['Land-Sq-Mi']
                 count +=1
         white = sum_white / count
         black = sum_black / count
         unemp = sum_unem / count
-        dens   = sum_den / count
+        dens = sum_den / sum_land
 
-        df_average = df_average.append({'Labels': i, 'White %': white, 'Black %': black, 'Unemp. Rate': unemp, 'Density Per Sq Mile': sum_den}, ignore_index='true')
+        df_average = df_average.append({'Labels': i, 'White %': white, 'Black %': black, 'Unemp. Rate': unemp, 'Density Per Sq Mile': dens}, ignore_index='true')
     print "done---"
     df_average.to_csv('averages_per_cluster.csv')
 
@@ -209,7 +211,7 @@ data, zips, raw_data = process_data(data_file)
 #threshold = stats.scoreatpercentile(out_in, 10)
 #print out_in
 #plot_outliers(data, out_in, threshold)
-#db_scan(data)
-labels = hierarhical_clustering(data)
-results_to_csv(zips, labels, 'hc_results.csv')
-averages(labels, raw_data)
+labels = db_scan(data)
+#labels = hierarhical_clustering(data)
+results_to_csv(zips, labels, 'hc_results_db.csv')
+#averages(labels, raw_data)
