@@ -21,7 +21,7 @@ def prepare_data(learn_file, labels_file):
     """
     print "---preparing data...",
     l_set = pd.read_csv(learn_file, sep='\t')
-    l_set = l_set.iloc[::10, :]
+    l_set = l_set.iloc[::20, :]
 
     #replace NaN values with zero.
     l_set = l_set.fillna(0)
@@ -35,7 +35,7 @@ def prepare_data(learn_file, labels_file):
 
     print "done---"
 
-    #remove None - for testing on part data
+    #remove where ZIP None - for testing on part data
     l_set = l_set[l_set.zip.notnull()]
 
     #X for learning features, y for click
@@ -55,6 +55,12 @@ def prepare_data(learn_file, labels_file):
 
 
 def random_forest(X, y):
+    """
+    Scikit Random Forest implementation
+    with 100 trees, testing on 0.4 part
+    of the data, and train on 0.6.
+    """
+
     #Scale data
     X = StandardScaler().fit_transform(X)
     #split data to train and test
@@ -84,7 +90,12 @@ def random_forest(X, y):
     print AUC
     """
 
+
 def logistic_regression(X, y):
+    """
+    Scikit logistic regression implementation,
+    testing only, beacuse of poor AUC.
+    """
     #Scale data
     X = StandardScaler().fit_transform(X)
     #split data to train and test
@@ -100,6 +111,10 @@ def logistic_regression(X, y):
 
 
 def orange_random_forest():
+    """
+    Orange random forest implementation
+    with K-fold cross validation.
+    """
     #Scale data
     #X = StandardScaler().fit_transform(X)
     #split data to train and test
@@ -113,17 +128,33 @@ def orange_random_forest():
 
 
 def orange_stacking():
+    """
+    Orange stacking implementation based on
+    example code found in orange documentation:
+    http://orange.biolab.si/docs/latest/reference/rst/Orange.ensemble.html#id1
+    """
     data = Orange.data.Table("data.csv")
     #prepare 0 level learners
     forest = Orange.ensemble.forest.RandomForestLearner(trees=100, name="forest")
     bayes = Orange.classification.bayes.NaiveLearner(name="bayes")
-    lin = Orange.classification.svm.LinearLearner(name="lr")
-    zero_level_clf = [forest, bayes, lin]
+    log = Orange.classification.logreg.LogRegLearner()
+    knn = Orange.classification.knn.kNNLearner()
+    #lin = Orange.classification.svm.LinearLearner(name="lr")
+    zero_level_clf = [knn, bayes, log]
     stack = Orange.ensemble.stacking.StackedClassificationLearner(zero_level_clf)
-    res = Orange.evaluation.testing.cross_validation(zero_level_clf, data, folds=5)
-    print "\n".join(["%8s: %5.3f" % (l.name, r) for r, l in zip(Orange.evaluation.scoring.CA(res), zero_level_clf)])
+    clf = [stack, knn, bayes, log]
+    res = Orange.evaluation.testing.cross_validation(clf, data, folds=5)
+    print "\n".join(["%8s: %5.3f" % (l.name, r) for r, l in zip(Orange.evaluation.scoring.AUC(res), clf)])
+    #print "AUC:      %.2f" % Orange.evaluation.scoring.AUC(res)[0]
+
 
 def stacking(X, y):
+    """
+    Stacking with scikit, implemented
+    based on example found in
+    https://github.com/log0/vertebral/blob/master/stacked_generalization.py
+    """
+
     classifiers = [rfc(n_estimators=50), etc(n_estimators=100), LogisticRegression()]
     #Scale data
     X = StandardScaler().fit_transform(X)
@@ -147,7 +178,7 @@ def stacking(X, y):
 
 
 learning_set = "C:\BigData\Zemanta_challenge_1_data/training_set.tsv"
-learning_part = "C:\BigData\Zemanta_challenge_1_data/training_set.tsv"
+learning_part = "C:\BigData\Zemanta_challenge_1_data/training_part.tsv"
 labels = "hc_results.csv"
 X, y = prepare_data(learning_part, labels)
 #random_forest(X, y)
