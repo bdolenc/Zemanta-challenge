@@ -175,7 +175,7 @@ def averages_fix(labels, all_data):
     return df_average
 
 
-data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
+data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL.csv"
 data, zips, raw_data = process_data(data_file)
 
 labels = db_scan(data)

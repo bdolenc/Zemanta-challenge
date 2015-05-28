@@ -119,7 +119,7 @@ def prepare_data(coordinates, hc_results):
     return df_merged
 
 
-all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
+all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL.csv"
 df_data = prepare_data('zipcode.csv', '../hc_results.csv')
 createKML(df_data, 'google-points.kml', '../averages_per_cluster_final.csv', all_file)
 
