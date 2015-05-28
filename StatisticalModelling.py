@@ -105,8 +105,8 @@ def stacking_scikit(X, y, n_estimators):
     """
     X = X.as_matrix()
     y = y.as_matrix()
-    base_classifiers = [RandomForestClassifier(n_estimators=n_estimators, criterion = 'gini'),
-                        ExtraTreesClassifier(n_estimators=n_estimators, criterion = 'gini'),
+    base_classifiers = [RandomForestClassifier(n_estimators=n_estimators),
+                        ExtraTreesClassifier(n_estimators=n_estimators),
                         GradientBoostingClassifier(n_estimators=n_estimators)]
     clf_names = ["Random Forest", "Extra Trees Classifier", "Gradient Boosting Classifier"]
     # Divide data on training and test set
