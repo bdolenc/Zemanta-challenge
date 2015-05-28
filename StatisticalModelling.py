@@ -1,5 +1,4 @@
 #The code is published under MIT license.
-from sklearn.ensemble import RandomForestClassifier as rfc
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.ensemble import GradientBoostingClassifier
