@@ -1,3 +1,5 @@
+#The code is published under MIT license.
+
 import pandas as pd
 import numpy as np
 import csv
@@ -15,30 +17,15 @@ def file_handler(file1, file2, output_csv):
         merge['Zip'], merge['Unnamed: 0_y'], merge['Zip/ZCTA'], merge['2010 Population']
     merge['Unemp. Rate'] = merge['Unemp. Rate'].str.strip('%')
 
-    #merge.convert_objects(convert_numeric=True)
-
-    #compute average unemployment
-    #av_unemployment = merge['Unemp. Rate'].mean()
-    #print av_unemployment
-
-    #replace NaN values with zeroes
-    #merge.fillna(0)
-
-
-    #use average unemployment instead of Nan for ['Unemp. Rate'].
-    #replace NaN values with zeroes
-    #merge = merge.fillna(0)
-
-
-
     merge.to_csv(output_csv)
     return merge
 
+
 def merge_establishments(input_name, output_name):
     """
-    Read chunks of establishments_by_zip in pandas
-    data frame and append to appropriate zip in
-    data frame
+    Read file establishments_by_zip row by row
+    and append features to appropriate zip in
+    data frame. Merge and write to CSV file.
     """
     # new column names
     column_names = ['ZIP', '_all', '_1to4', '_5to9', '_10to19', '_20to49', '_50to99', '_100to249',
