@@ -178,15 +178,17 @@ def averages_fix(labels, all_data):
 data_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
 data, zips, raw_data = process_data(data_file)
 
-#labels = db_scan(data)
-#labels = hierarhical_clustering(data)
-#results_to_csv(zips, labels, 'hc_results_db.csv')
-labels = []
-with open("hc_results.csv", "rb") as csv_file:
-        data = csv.reader(csv_file, delimiter=',')
-        for row in data:
-            labels.append(row[1])
+labels = db_scan(data)
+labels = hierarhical_clustering(data)
+results_to_csv(zips, labels, 'hc_results_db.csv')
+# labels = []
+
+
+# with open("hc_results.csv", "rb") as csv_file:
+#         data = csv.reader(csv_file, delimiter=',')
+#         for row in data:
+#             labels.append(row[1])
 
 #print labels
-labels = [int(i) for i in labels]
-averages_fix(labels, raw_data)
+# labels = [int(i) for i in labels]
+# averages_fix(labels, raw_data)
