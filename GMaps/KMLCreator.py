@@ -1,13 +1,10 @@
-import csv
+#The code bellow is based on Sample python code published on
+#https://developers.google.com/kml/articles/csvtokml?csw=1
+#but highly modified.
+#The code is published under MIT license.
+
 import xml.dom.minidom
-import sys
 import pandas as pd
-
-
-def extractAddress(row):
-    # This extracts an address from a row and returns it as a string. This requires knowing
-    # ahead of time what the columns are that hold the address information.
-    return '%s,%s,%s,%s,%s' % (row['Address1'], row['Address2'], row['City'], row['State'], row['Zip'])
 
 
 def createPlacemark(kmlDoc, row, aver_row, all_row):
@@ -17,21 +14,11 @@ def createPlacemark(kmlDoc, row, aver_row, all_row):
     extElement = kmlDoc.createElement('ExtendedData')
     placemarkElement.appendChild(extElement)
 
-  # Loop through the columns and create a  element for every field that has a value.
-    #for key in row:
-    #    if key != ''
-    #        dataElement = kmlDoc.createElement('Data')
-    #        dataElement.setAttribute('name', key)
-    #        valueElement = kmlDoc.createElement('value')
-    #        dataElement.appendChild(valueElement)
-    #        valueText = kmlDoc.createTextNode(row[key])
-    #        valueElement.appendChild(valueText)
-    #        extElement.appendChild(dataElement)
     latitude = row[1]['latitude']
     longitude = row[1]['longitude']
     colors = ['#FFFF00', '#FFCC00', '#FF3300', '#CCFF00', '#CC9900', '#CC3300', '#99FF00', '#999900', '#993300'
-            ,'#000099', '#660099', '#66CC99', '#FF0099', '#FFFFFF', '#000000', '#003300', '#CCCCCC', '#CC00CC'
-            ,'#669966', '#663366']
+              , '#000099', '#660099', '#66CC99', '#FF0099', '#FFFFFF', '#000000', '#003300', '#CCCCCC', '#CC00CC'
+              , '#669966', '#663366']
 
     #create popup with relevant info about zip
     dataElement = kmlDoc.createElement('Data')
@@ -113,6 +100,7 @@ def createKML(df_data, fileName, aver_file, all_file):
     df_all = pd.read_csv(all_file)
 
     for row in df_data.iterrows():
+        # if row[1]['Labels'] == 19:
         aver_row = df_averages.loc[df_averages['Labels'] == row[1]['Labels']]
         all_row = df_all.loc[df_all['ZIP'] == row[1]['ZIP']]
         placemarkElement = createPlacemark(kmlDoc, row, aver_row, all_row)
@@ -131,19 +119,9 @@ def prepare_data(coordinates, hc_results):
     return df_merged
 
 
-
-def main():
-    # This reader opens up 'google-addresses.csv', which should be replaced with your own.
-    # It creates a KML file called 'google.kml'.
-
-    # If an argument was passed to the script, it splits the argument on a comma
-    # and uses the resulting list to specify an order for when columns get added.
-    # Otherwise, it defaults to the order used in the sample.
-    all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
-    df_data = prepare_data('zipcode.csv', '../hc_results.csv')
-    kml = createKML(df_data, 'google-points.kml', '../averages_per_cluster.csv', all_file)
+all_file = "C:\BigData\Zemanta_challenge_1_data/FINAL_nan_new2.csv"
+df_data = prepare_data('zipcode.csv', '../hc_results.csv')
+createKML(df_data, 'google-points.kml', '../averages_per_cluster_final.csv', all_file)
 
 
 
-if __name__ == '__main__':
-    main()
