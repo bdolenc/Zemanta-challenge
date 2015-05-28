@@ -3,13 +3,10 @@
 import pandas as pd
 from sklearn import svm
 from sklearn.cluster import DBSCAN
-from scipy import stats
 from sklearn.decomposition import IncrementalPCA
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import StandardScaler
 from sklearn import preprocessing
 import numpy as np
-from sklearn.manifold import MDS
 from sklearn.cluster import AgglomerativeClustering
 import csv
 
